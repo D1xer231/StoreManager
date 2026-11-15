@@ -19,16 +19,16 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
         <Grid Grid.Column="0">
-            <!-- <Image/> -->
+            <Image Source="/Images/Cart.png" Stretch="Uniform" Width="200" Height="200"/>
         </Grid>
         <Grid Grid.Column="1">
-            <Button Content="✕" FontSize="20" Width="35" Height="35" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="15" Click="CloseButton_Click"/>
+            <Button Content="X" FontSize="20" Width="35" Height="35" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="15" Click="CloseButton_Click"/>
             <StackPanel Width="300" VerticalAlignment="Center" HorizontalAlignment="Center">
                 <!-- Welcome/ Login Text -->
                 <TextBlock Text="Store Manager Login" FontSize="28" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,0,0,40"/>
                 <TextBox x:Name="LoginTextBox" FontSize="15" Height="55" Margin="0,0,0,20" materialDesign:HintAssist.Hint="Username" Style="{StaticResource MaterialDesignFloatingHintTextBox}"/>
                 <!-- Password -->
-                <PasswordBox x:Name="PasswordTextBox" FontSize="15" Height="55" Margin="0,0,0,30" materialDesign:HintAssist.Hint="Password" Style="{StaticResource MaterialDesignFloatingHintRevealPasswordBox}"/>
+                <PasswordBox x:Name="PasswordBox" FontSize="15" Height="55" Margin="0,0,0,30" materialDesign:HintAssist.Hint="Password" Style="{StaticResource MaterialDesignFloatingHintRevealPasswordBox}"/>
                 <!-- Login -->
                 <Button x:Name="LoginButton" Content="LOGIN" Height="45" Click="LoginButton_Click"/>
                 <!-- Support -->
