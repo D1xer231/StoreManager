@@ -1,4 +1,6 @@
-﻿using StoreManager.Services;
+﻿using StoreManager.Models;
+using StoreManager.Services;
+using StoreManager.ViewModels;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -6,9 +8,11 @@ using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace StoreManager
 {
@@ -18,56 +22,74 @@ namespace StoreManager
     public partial class MainWindow : Window
     {
         private AppDbContext? db;
-        private readonly AuthService _authService = new AuthService();
         public MainWindow()
         {
             InitializeComponent();
+            DataContext = new WebOpen();
+            DateAndTimeSet();
         }
 
         private async void LoginButton_Click(object sender, RoutedEventArgs e)
         {
-            string username = LoginTextBox.Text.Trim();
-            string password = PasswordBox.Password;
+            using var context = new AppDbContext();
 
-            if (string.IsNullOrWhiteSpace(username) ||
-                string.IsNullOrEmpty(password))
+            var loginService = new LoginService(
+                UserNameTextBox,
+                PasswordBox,
+                context
+            );
+
+            bool success = loginService.Login(
+                UserNameTextBox,
+                PasswordBox
+            );
+
+            if (success)
             {
-                MessageBox.Show("Please enter username and password.");
-                return;
+                MessageBox.Show("Login successful!");
+                ShowScreen(ScreenType.Home);
+                WelcomeUserNameText.Text = context.Users.FirstOrDefault(u => u.FirstName == UserNameTextBox.Text)?.FirstName.ToUpper();
             }
-
-            try
+            else
             {
-                var user = await _authService.LoginAsync(username, password);
-
-                if (user == null)
-                {
-                    MessageBox.Show("Invalid username or password.");
-                    return;
-                }
-
-                MessageBox.Show($"Welcome, {user.FirstName}!"); // Change to main screen after login (in future)
-
-                // Open main application window
-                MainWindow mainWindow = new MainWindow();
-                mainWindow.Show();
-
-                this.Close();
+                MessageBox.Show("Invalid username or password!");
             }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Login error: {ex.Message}");
-            }
-
-        }
-
-        private void ContactSupportButton_Click(object sender, RoutedEventArgs e)
-        {
-
         }
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
             this.Close(); // temporary after change to more right one for db
+        }
+        private void ToCheckoutBtn_Click(object sender, RoutedEventArgs e) => ShowScreen(ScreenType.Checkout);
+        private void ShowScreen(ScreenType type)
+        {
+            LoginGrid.Visibility = Visibility.Hidden;
+            HomeGrid.Visibility = Visibility.Hidden;
+            CheckoutGrid.Visibility = Visibility.Hidden;
+
+            switch (type)
+            {
+                case ScreenType.Login: LoginGrid.Visibility = Visibility.Visible; break;
+                case ScreenType.Home: HomeGrid.Visibility = Visibility.Visible; break;
+                case ScreenType.Checkout: CheckoutGrid.Visibility = Visibility.Visible; break;
+            }
+        }
+        public enum ScreenType
+        {
+            Login,
+            Home,
+            Checkout
+        }
+        private void DateAndTimeSet()
+        {
+            DispatcherTimer timer = new DispatcherTimer();
+            timer.Interval = TimeSpan.FromSeconds(1);
+
+            timer.Tick += (s, e) =>
+            {
+                ClockText.Text = DateTime.Now.ToString("HH:mm:ss");
+                DateText.Text = DateTime.Now.ToString("dd/MM/yyyy");
+            };
+            timer.Start();
         }
     }
 }
